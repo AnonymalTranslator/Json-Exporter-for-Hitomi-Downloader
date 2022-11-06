@@ -1,0 +1,61 @@
+#coding: utf8
+#title: File Data JSON Export
+#author: AnoTran
+
+win = QtGui.QMainWindow(mainWindow)
+win.setWindowTitle(u'File Data JSON Export')
+win.setWindowFlag(QtCore.Qt.WindowMinMaxButtonsHint, False)
+win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+
+widget =  QtGui.QWidget(win)
+win.setCentralWidget(widget)
+layout = QtGui.QHBoxLayout(widget)
+
+layout_left = QtGui.QVBoxLayout()
+layout.addLayout(layout_left)
+
+button = MyPushButton(color='HL')
+layout.addWidget(button)
+button.setCursor(QtCore.Qt.PointingHandCursor)
+button.setIcon(getIcon('save', color=(255,)*3))
+size = 32 * DPI / 96
+button.setIconSize(QtCore.QSize(size, size))
+
+def submit():
+    try:
+        import json
+        
+        ll = [ui.listWidget.item(i) for i in range(ui.listWidget.count())]
+
+        data = {
+            'tags': {
+                'red': [f'{x.title}' for x in list(filter(lambda x: 'red' in x.tags, ll))],
+                'orange': [f'{x.title}' for x in list(filter(lambda x: 'orange' in x.tags, ll))],
+                'yellow': [f'{x.title}' for x in list(filter(lambda x: 'yellow' in x.tags, ll))],
+                'green': [f'{x.title}' for x in list(filter(lambda x: 'green' in x.tags, ll))],
+                'blue': [f'{x.title}' for x in list(filter(lambda x: 'blue' in x.tags, ll))],
+                'purple': [f'{x.title}' for x in list(filter(lambda x: 'purple' in x.tags, ll))],
+                'gray': [f'{x.title}' for x in list(filter(lambda x: 'gray' in x.tags, ll))],
+                'untaged': [f'{x.title}' for x in list(filter(lambda x: len(x.tags) == 0, ll))],
+            }
+        }
+        
+        with open('result.json', 'w', encoding='utf8') as f:
+            json.dump(data, f)
+
+        messageBox('Create Json is Done', 'Done')
+    except Exception as e:
+        err_msg = print_error(e)[0]
+        messageBox('Failed to replace\n\n{}'.format(err_msg), 'Error', icon=QtGui.QMessageBox.Critical)
+
+
+button.clicked.connect(submit)
+
+CustomToolTip(button, tip_float, u'Start')
+
+windows.append(win)
+win.show()
+
+pos = mainWindow.pos() + QtCore.QPoint(mainWindow.width()/2, mainWindow.height()/2) - QtCore.QPoint(win.width()/2, win.height()/2)
+win.move(pos)
+
